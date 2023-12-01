@@ -1,0 +1,54 @@
+name: Build Docker Image
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install Docker on EC2
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }} # EC2 instance IP or DNS
+          username: ${{ secrets.EC2_USERNAME }} # EC2 instance username
+          key: ${{ secrets.EC2_SSH_KEY }} # SSH private key for authentication
+          script: |
+            sudo apt-get update
+            sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
+            curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+            sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+            sudo apt-get update
+            sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push Docker image to Docker Hub
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: kikibuh/app-of-the-year:latest
+
+      - name: SSH into EC2 and Deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }} # EC2 instance IP or DNS
+          username: ${{ secrets.EC2_USERNAME }} # EC2 instance username
+          key: ${{ secrets.EC2_SSH_KEY }} # SSH private key for authentication
+          script: |
+            sudo docker pull kikibuh/app-of-the-year:latest
+            sudo docker stop app-of-the-year-container || true
+            sudo docker rm app-of-the-year-container || true
+            sudo docker run -d -p 80:3000 --name app-of-the-year-container kikibuh/app-of-the-year:latest
