@@ -16,16 +16,22 @@ jobs:
       - name: Install Docker on EC2
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.EC2_HOST }} # EC2 instance IP or DNS
-          username: ${{ secrets.EC2_USERNAME }} # EC2 instance username
-          key: ${{ secrets.EC2_SSH_KEY }} # SSH private key for authentication
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
           script: |
+            set -e  # Stop script on error
+            set -x  # Print commands as they are executed
+
             sudo apt-get update
             sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
             curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
             sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
             sudo apt-get update
             sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+
+            # Check Docker installation status
+            sudo docker version
 
       - name: Login to Docker Hub
         uses: docker/login-action@v1
@@ -44,10 +50,17 @@ jobs:
       - name: SSH into EC2 and Deploy
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.EC2_HOST }} # EC2 instance IP or DNS
-          username: ${{ secrets.EC2_USERNAME }} # EC2 instance username
-          key: ${{ secrets.EC2_SSH_KEY }} # SSH private key for authentication
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
           script: |
+            set -e  # Stop script on error
+            set -x  # Print commands as they are executed
+
+            # Ensure Docker is installed
+            sudo docker version
+
+            # Pull the latest image and run the container
             sudo docker pull kikibuh/app-of-the-year:latest
             sudo docker stop app-of-the-year-container || true
             sudo docker rm app-of-the-year-container || true
