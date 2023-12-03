@@ -52,5 +52,3 @@ jobs:
             sudo docker stop app-of-the-year-container || true
             sudo docker rm app-of-the-year-container || true
             sudo docker run -d -p 80:3000 --name app-of-the-year-container kikibuh/app-of-the-year:latest
-
-###
