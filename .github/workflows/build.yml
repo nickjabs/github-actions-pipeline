@@ -60,9 +60,10 @@ jobs:
             # Ensure Docker is installed
             sudo docker version
 
-            # Pull the latest image and run the container
+            # Pull the latest image
             sudo docker pull kikibuh/app-of-the-year:latest
+
+            # Remove existing containers if any and start a new container
             sudo docker stop app-of-the-year-container || true
             sudo docker rm app-of-the-year-container || true
             sudo docker run -d -p 80:3000 --name app-of-the-year-container kikibuh/app-of-the-year:latest
-#
