@@ -1,33 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Deployment of a Simple Node.js App on AWS EC2</title>
-  <!-- Some CSS styles for better readability -->
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      line-height: 1.6;
-      padding: 20px;
-      max-width: 800px;
-      margin: 0 auto;
-      background-color: #f4f4f4;
-    }
-    h1 {
-      color: #333;
-    }
-    p {
-      color: #666;
-    }
-    code {
-      background-color: #f9f9f9;
-      padding: 2px 5px;
-      border-radius: 4px;
-      font-family: monospace;
-    }
-  </style>
-</head>
-<body>
   <h1>🚀 Deployment of a Simple Node.js Application on AWS EC2 🌐</h1>
   <p>Welcome to the guide on deploying your Node.js app to the cloud! This guide uses Terraform and GitHub Actions to automate the process.</p>
 
